@@ -1,0 +1,68 @@
+# cloud-init-prometheus.yml — установка Prometheus и Node/Nginx Log Exporter
+
+#cloud-config
+packages:
+  - prometheus
+  - wget
+  - unzip
+
+runcmd:
+  - useradd --no-create-home --shell /bin/false node_exporter
+  - wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+  - tar xvf node_exporter-1.6.1.linux-amd64.tar.gz
+  - cp node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/
+  - chown node_exporter:node_exporter /usr/local/bin/node_exporter
+  - |
+    echo "[Unit]
+    Description=Node Exporter
+    After=network.target
+
+    [Service]
+    User=node_exporter
+    ExecStart=/usr/local/bin/node_exporter
+
+    [Install]
+    WantedBy=default.target" > /etc/systemd/system/node_exporter.service
+  - systemctl daemon-reexec
+  - systemctl enable node_exporter
+  - systemctl start node_exporter
+
+  # Nginx Log Exporter
+  - mkdir -p /opt/nginxlogexporter
+  - wget -O /opt/nginxlogexporter/nginxlogexporter.tar.gz https://github.com/martin-helmich/prometheus-nginxlog-exporter/releases/download/v1.9.1/prometheus-nginxlog-exporter_1.9.1_linux_amd64.tar.gz
+  - tar -xzvf /opt/nginxlogexporter/nginxlogexporter.tar.gz -C /opt/nginxlogexporter
+  - ln -s /opt/nginxlogexporter/prometheus-nginxlog-exporter /usr/local/bin/nginxlogexporter
+  - |
+    echo "listen-address: ':4040'
+    namespace: nginx
+    log-format: combined
+    positions-file: /var/log/nginxlogexporter.positions.yaml
+    targets:
+      - source: /var/log/nginx/access.log
+        labels:
+          app: nginx" > /etc/nginxlogexporter.yml
+  - |
+    echo "[Unit]
+    Description=Nginx Log Exporter
+
+    [Service]
+    ExecStart=/usr/local/bin/nginxlogexporter -config-file /etc/nginxlogexporter.yml
+
+    [Install]
+    WantedBy=multi-user.target" > /etc/systemd/system/nginxlogexporter.service
+  - systemctl daemon-reexec
+  - systemctl enable nginxlogexporter
+  - systemctl start nginxlogexporter
+
+  # Настройка prometheus.yml
+  - |
+    echo "global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: 'node_exporter'
+        static_configs:
+          - targets: ['<IP1>:9100', '<IP2>:9100']
+      - job_name: 'nginx_logs'
+        static_configs:
+          - targets: ['<IP1>:4040', '<IP2>:4040']" > /etc/prometheus/prometheus.yml
+  - systemctl restart prometheus

@@ -1,0 +1,45 @@
+# cloud-init.yml — для настройки пользователя и установки nginx со статикой
+# используется в metadata user-data для web-серверов
+
+#cloud-config
+users:
+  - name: user
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    ssh-authorized-keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM5m9AhMRWiO+yybLYEHaJhFaODFZDTbOiYqitAxzWgs alexey@dell
+
+packages:
+  - nginx
+
+write_files:
+  - path: /var/www/html/index.html
+    content: |
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>Welcome</title>
+      </head>
+      <body>
+        <h1>Welcome to the Web Cluster Tatarintseva Alexeya</h1>
+      </body>
+      </html>
+  
+  - path: /etc/nginx/sites-available/default
+    content: |
+      server {
+          listen 80 default_server;
+          listen [::]:80 default_server;
+          root /var/www/html;
+          index index.html;
+          server_name _;
+          location / {
+              try_files $uri $uri/ =404;
+          }
+      }
+
+runcmd:
+  - systemctl enable nginx
+  - systemctl restart nginx

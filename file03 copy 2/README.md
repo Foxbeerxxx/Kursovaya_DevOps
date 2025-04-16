@@ -321,6 +321,50 @@ variable "test" {
 `Балансировщик`
 ![7](https://github.com/Foxbeerxxx/Kursovaya_DevOps/blob/main/img/img7.png)`
 
+`Сеть`
+![8](https://github.com/Foxbeerxxx/Kursovaya_DevOps/blob/main/img/img8.png)`
+
+7. `Пробую тестировать сайт curl -v 158.160.144.11:80 и результата нет, выдает ошибку`    
+
+![9](https://github.com/Foxbeerxxx/Kursovaya_DevOps/blob/main/img/img9.png)`
+
+
+
+
+*****************************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ---

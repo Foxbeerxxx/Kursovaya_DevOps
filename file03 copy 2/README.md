@@ -310,18 +310,17 @@ variable "test" {
 
 ```
 
-6. 
+6. `Отрабатываю .чтобы проверить и запустить , проделанное. Запускается.`
 
-```
-Поле для вставки кода...
-....
-....
-....
-....
-```
+![5](https://github.com/Foxbeerxxx/Kursovaya_DevOps/blob/main/img/img5.png)`
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота 1](ссылка на скриншот 1)`
+`ВМ`
+
+![6](https://github.com/Foxbeerxxx/Kursovaya_DevOps/blob/main/img/img6.png)`
+
+`Балансировщик`
+![7](https://github.com/Foxbeerxxx/Kursovaya_DevOps/blob/main/img/img7.png)`
+
 
 
 ---
